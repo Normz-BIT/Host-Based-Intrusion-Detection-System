@@ -1,4 +1,4 @@
-# logger.py
+# log.py
 # writes all the security Detections to a file
 import logging # native logging module
 from datetime import datetime # get system date and time
@@ -36,5 +36,7 @@ def log(event_type, severity, source, description):
 
     # send information to logger onbject that writes to hids.log
     logging.info(entry)
-    alert() # user is alerted after every log 
+    # user is alerted after every log
+    alert() 
+    
 

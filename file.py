@@ -1,4 +1,4 @@
-# file_monitor.py
+# file.py
 import os.path  # for file reading and writing
 import hashlib  # to generate file sha256 hashes 
 import json     # json read and write functions

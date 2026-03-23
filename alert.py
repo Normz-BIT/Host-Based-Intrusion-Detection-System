@@ -1,11 +1,11 @@
-# alerts.py 
+# alert.py 
 # desktop notification module
 import subprocess
 import os.path  # for file reading and writing
 
 title = "HIDS Security Events Detected"
 
- # Send alerts
+ # Send alert
 def alert():
     # Read the lastline of hids.log to alert
     alert_lines = []

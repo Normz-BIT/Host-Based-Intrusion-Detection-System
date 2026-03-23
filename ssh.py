@@ -1,4 +1,4 @@
-# ssh_monitor.py
+# ssh.py
 import os.path  # for file reading and writing
 from collections import defaultdict #dictionary module to store data
 from datetime import datetime, timedelta  #time and date modules
@@ -9,7 +9,7 @@ from log import Severity #enum for diffrent severity levels
 SSH = "SSH MONITOR"
 AUTH_LOG = '/var/log/auth.log' # location of ssh log file
 THRESHOLD = 5        # failed attempts
-TIME_WINDOW = 120    # seconds (2 minutes)
+TIME_WINDOW = 2   #  2 minutes
 
 # find failed SSH login lines
 # Example lines: 
@@ -60,19 +60,24 @@ def detect_brute_force():
         })
     # check number of falied attempts per ip
     for ip, attempts in ip_detected.items():
+        # Sort attempts oldest to newest by time
+        attempts.sort(key=lambda x: x['time']) 
+
+        for index,attempt in enumerate(attempts):
+            # get time two minutes after current attempt
+            window_end = attempt['time'] + timedelta(minutes=TIME_WINDOW)
           
-        if check_logins(attempts):
-            usernames = list({a['username'] for a in attempts})
-            desc = f"{len(attempts)} failed logins (users: {', '.join(usernames)})"
-            log('SSH_BRUTE_FORCE', 'High', ip, desc)
+            # Count how many attempts fall within the 2 minutes 
+            window = [a for a in attempts[index:] if a['time'] <= window_end]
+
+            if len(window) >= THRESHOLD:
+                # get list of usernames with the same ip
+                usernames = list({a['username'] for a in window})
+                # create a discription with the names
+                desc = f"{len(attempts)} failed logins (users: {', '.join(usernames)})"
+                # Log intrusion event
+                log(Event.SSH_BRUTE_FORCE, Severity.High, ip, desc)
           
 
-#check for 5 failed logins with 2 minutes
-def check_logins(attempts):
-    sliding_windows = []
-    sliding_windows = (attempts[i:] for i in range(THRESHOLD) if attempts[i:])
 
-    for attempt in sliding_windows:   
-        for timestamp in attempt:
-            print(timestamp['timestamp'])
 

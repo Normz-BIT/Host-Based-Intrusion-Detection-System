@@ -10,16 +10,17 @@
 # send at least one type of alert
 # demonstrate detection using simulated attacks.
 
-
-
 import time     # for sleep function
 from file import check_integrity  # monitir files for any alterations
 from ssh import detect_brute_force #monitor ssh for brute force attempts
+
+#startup function
 def startup():
     print("=" * 50)
     print("IslandPay Tech Limited Intrusion Detection System")
     print("=" * 50)    
 
+# runs the file monitoring, ssh checks,logs and alerts
 def run_hids():
     # File Integrity Check
     print("\nRunning file integrity checks ...")
@@ -29,10 +30,13 @@ def run_hids():
     print("\nScanning SSH logs for brute force attempts...")
     detect_brute_force()
 
+
 if __name__ == '__main__':
     startup()
+    #run checks in a loop until program is closed
     while True:
         run_hids()
+        #sleep so as to reduce cpu cycles 
         time.sleep(1)
-
+#close message
 print("\nHIDS scan complete. Check hids.log for details.")
