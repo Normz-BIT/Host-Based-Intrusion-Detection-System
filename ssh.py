@@ -68,8 +68,6 @@ def check_logs(desc):
                     return False
     return True
 
-
-
 def detect_brute_force():
     lines = read_log()
     # get list of failed logins
@@ -81,7 +79,7 @@ def detect_brute_force():
         
         index = 0
         while index < len(attempts):
-            # get time two minutes after current attempt
+            # Get time two minutes after current attempt
             window_end = attempts[index]['time'] + timedelta(minutes=TIME_WINDOW)
           
             # Count how many attempts fall within the 2 minutes 
@@ -96,9 +94,10 @@ def detect_brute_force():
                 if check_logs(desc):
                     # Log intrusion event
                     log(Event.SSH_BRUTE_FORCE, Severity.High, ip, desc)
-                
+                #advance to the next batch of attempts    
                 index+=len(window)
                 continue
+            #advance normally
             index+=1
                     
                 
