@@ -40,7 +40,7 @@ def run_hids():
     check_integrity()
 
     # SSH Brute Force Detection
-    spinner("Scanning SSH logs for brute force attempts...",'\033[F\r')
+    spinner("Scanning SSH logs for brute force attempts...","\r\n")
 
     detect_brute_force()
 
@@ -51,6 +51,7 @@ if __name__ == '__main__':
     while True:
         run_hids()
         #sleep to reduce cpu cycles 
+        spinner("sleeping","\033[F\033[F\r")
         time.sleep(5)
 #close message
 print("\nHIDS scan complete. Check hids.log for details.")
