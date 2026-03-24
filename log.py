@@ -14,9 +14,9 @@ logging.basicConfig(
 
 # Diffrent severity levels  Low | Medium | High
 class Severity(StrEnum):
-    Low = "Low"
-    Medium = "Medium"
-    High = "High"
+    Low     = "Low   "
+    Medium  = "Medium"
+    High    = "High  "
 
 # Diffrent event types  FILE_ADDED | FILE_MODIFIED | FILE_DELETED | HASH_GENERATION_ERROR|SSH_BRUTE_FORCE
 class Event(StrEnum):

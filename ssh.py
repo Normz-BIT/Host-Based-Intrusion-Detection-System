@@ -14,12 +14,12 @@ TIME_WINDOW = 2   #  2 minutes
 def read_log():
     if os.path.exists(AUTH_LOG):
         try:
-            with open(AUTH_LOG, 'r', errors='replace') as f:
+            with open(AUTH_LOG, 'r') as f:
                 lines = f.readlines()
             if lines:
                 return lines
-        except PermissionError:
-            print(f"Permission denied reading {AUTH_LOG}.")
+        except Exception as e:
+            print(f"Error Reading {AUTH_LOG}: {e}")
 
 # find failed SSH login lines
 #2026-03-23T18:01:26.253290-05:00 nm sshd[17465]: Failed password for norman-martin from 192.168.0.10 port 55954 ssh2
@@ -53,6 +53,7 @@ def search_logs(lines):
             for x in range(count):
                 # account for number of times message was repeated
                 ip_detected[ip].append ({'username': username,'time': datetime.fromisoformat(timestamp)})
+        #print(line)
     return ip_detected
 
 
@@ -77,10 +78,11 @@ def detect_brute_force():
     for ip, attempts in ip_detected.items():
         # Sort attempts oldest to newest by time
         attempts.sort(key=lambda x: x['time']) 
-
-        for index,attempt in enumerate(attempts):
+        
+        index = 0
+        while index < len(attempts):
             # get time two minutes after current attempt
-            window_end = attempt['time'] + timedelta(minutes=TIME_WINDOW)
+            window_end = attempts[index]['time'] + timedelta(minutes=TIME_WINDOW)
           
             # Count how many attempts fall within the 2 minutes 
             window = [a for a in attempts[index:] if a['time'] <= window_end]
@@ -94,7 +96,12 @@ def detect_brute_force():
                 if check_logs(desc):
                     # Log intrusion event
                     log(Event.SSH_BRUTE_FORCE, Severity.High, ip, desc)
-                break
+                
+                index+=len(window)
+                continue
+            index+=1
+                    
+                
           
 
 
