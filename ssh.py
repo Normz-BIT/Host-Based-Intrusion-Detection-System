@@ -6,15 +6,9 @@ from log import log #looging module
 from log import Event # enum for the diffrent events 
 from log import Severity #enum for diffrent severity levels
 
-SSH = "SSH MONITOR"
-AUTH_LOG = '/var/log/auth.log' # location of ssh log file
+AUTH_LOG = "/var/log/auth.log" # location of ssh log file
 THRESHOLD = 5        # failed attempts
 TIME_WINDOW = 2   #  2 minutes
-
-# find failed SSH login lines
-# Example lines: 
-# 2026-03-23T03:26:06.583278-05:00 nm sshd[14867]: Failed password for norman-martin from 192.168.0.10 port 38078 ssh2
-
 
 # read auth.log 
 def read_log():
@@ -27,9 +21,10 @@ def read_log():
         except PermissionError:
             print(f"Permission denied reading {AUTH_LOG}.")
 
-
-def detect_brute_force():
-    lines = read_log()
+# find failed SSH login lines
+#2026-03-23T18:01:26.253290-05:00 nm sshd[17465]: Failed password for norman-martin from 192.168.0.10 port 55954 ssh2
+#2026-03-23T18:01:35.916433-05:00 nm sshd[17465]: message repeated 2 times: [ Failed password for norman-martin from 192.168.0.10 port 55954 ssh2]
+def search_logs(lines):
     ip_detected = defaultdict(list) # dictionary to store ip,username,timestamp
 
     for line in lines:
@@ -37,27 +32,47 @@ def detect_brute_force():
             continue
 
         words = line.split()
-
-
         #extract time and date
         timestamp = words[0]
 
-        # Extract IP since the index is always the word after 'from'
+        # Extract IP since the index is always the word after "from"
         from_index = words.index('from')
         ip = words[from_index + 1]
-        
-
-        # Extract username since it comes after 'for', or after 'invalid user'
+    
+        # Extract username since it comes after "for"
         for_index = words.index('for')
-        if words[for_index + 1] == 'invalid':
-            username = words[for_index + 3]
-        else:
-            username = words[for_index + 1]
-        # Every ip detected is linkt to a nested list of [username,time]
-        ip_detected[ip].append ({
-            'username': username,
-            'time': datetime.fromisoformat(timestamp)
-        })
+        username = words[for_index + 1]
+        # Every ip detected is linked to a nested list of [username,time]
+        ip_detected[ip].append ({'username': username,'time': datetime.fromisoformat(timestamp)})
+
+        #account for repeated messages
+        if 'message repeated' in line:
+            repeated_index = words.index('repeated')
+            # number of times meaage was repeateed comes after "repeated"
+            count = int (words[repeated_index+1])- 1
+            for x in range(count):
+                # account for number of times message was repeated
+                ip_detected[ip].append ({'username': username,'time': datetime.fromisoformat(timestamp)})
+    return ip_detected
+
+
+#check log gile to ensure to prevent duplicate intrusion logging
+def check_logs(desc):
+    if os.path.exists("hids.log"): # check if file exist
+        with open("hids.log", "r") as f:# open file in read mode
+            lines = f.readlines() #create a list of all the lines in the file
+            #check if the same log is already in the file
+            for line in lines:
+                if desc in line:
+                    return False
+    return True
+
+
+
+def detect_brute_force():
+    lines = read_log()
+    # get list of failed logins
+    ip_detected = search_logs(lines) 
     # check number of falied attempts per ip
     for ip, attempts in ip_detected.items():
         # Sort attempts oldest to newest by time
@@ -73,10 +88,13 @@ def detect_brute_force():
             if len(window) >= THRESHOLD:
                 # get list of usernames with the same ip
                 usernames = list({a['username'] for a in window})
-                # create a discription with the names
-                desc = f"{len(attempts)} failed logins (users: {', '.join(usernames)})"
-                # Log intrusion event
-                log(Event.SSH_BRUTE_FORCE, Severity.High, ip, desc)
+                # create a discription with the usernames
+                desc = f"{len(window)} failed logins (users: {', '.join(usernames)}) @ {window[-1]['time']}"
+                #check log for same event
+                if check_logs(desc):
+                    # Log intrusion event
+                    log(Event.SSH_BRUTE_FORCE, Severity.High, ip, desc)
+                break
           
 
 

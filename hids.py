@@ -37,6 +37,6 @@ if __name__ == '__main__':
     while True:
         run_hids()
         #sleep so as to reduce cpu cycles 
-        time.sleep(1)
+        time.sleep(5)
 #close message
 print("\nHIDS scan complete. Check hids.log for details.")

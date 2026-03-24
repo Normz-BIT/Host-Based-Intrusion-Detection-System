@@ -7,8 +7,8 @@ from log import Severity #enum for diffrent severity levels
 from log import Event # enum for the diffrent events 
 
 
-FILE_MONITOR = 'FILE MONITOR' # to show current function in the terminal
-HASHES_FILE = 'hashes.json'  # name of the json file with the hashes
+FILE_MONITOR = "FILE MONITOR" # to show current function in the terminal
+HASHES_FILE = "hashes.json"  # name of the json file with the hashes
 MONITORED_DIR = '/etc'      # directory being monitored
 
 

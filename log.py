@@ -7,7 +7,7 @@ from alert import alert #function to send alerts of intrusions to user
 
 # Configure the logger to write to hids.log
 logging.basicConfig(
-    filename='hids.log',
+    filename="hids.log",
     level=logging.INFO,
     format='%(message)s'
 )
@@ -20,11 +20,10 @@ class Severity(StrEnum):
 
 # Diffrent event types  FILE_ADDED | FILE_MODIFIED | FILE_DELETED | HASH_GENERATION_ERROR|SSH_BRUTE_FORCE
 class Event(StrEnum):
-    FILE_ADDED = "FILE_ADDED"
-    FILE_MODIFIED = "FILE_MODIFIED"
-    FILE_DELETED = "FILE_DELETED"
-    HASH_GENERATION_ERROR = "HASH_GENERATION_ERROR"
-    SSH_BRUTE_FORCE = 'SSH_BRUTE_FORCE'
+    FILE_ADDED      = "FILE_ADDED     "
+    FILE_MODIFIED   = "FILE_MODIFIED  "
+    FILE_DELETED    = "FILE_DELETED   "
+    SSH_BRUTE_FORCE = "SSH_BRUTE_FORCE"
 
 def log(event_type, severity, source, description):
     # Write a structured event to hids.log.
