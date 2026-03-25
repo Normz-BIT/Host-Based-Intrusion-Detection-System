@@ -14,6 +14,10 @@ import time     # for sleep function
 from file import check_integrity  # monitir files for any alterations
 from ssh import detect_brute_force #monitor ssh for brute force attempts
 from spinner import spinner # for console loading
+import threading
+
+# to signal the main loop to stop
+stop_event = threading.Event()
 
 #startup function
 def startup():
@@ -32,28 +36,41 @@ def startup():
 +-----------------------------------------------------------------------------+
 """)
     
-
 # runs the file monitoring, ssh checks,logs and alerts
 def run_hids():
     # File Integrity Check
-    spinner("Running file integrity checks ...","\r\n")
+    spin = spinner("Running file integrity checks ...","\r\nee",stop=stop_event)
     check_integrity()
-
+    spin.join()
     # SSH Brute Force Detection
-    spinner("Scanning SSH logs for brute force attempts...","\r\n")
-
+    spin=spinner("Scanning SSH logs for brute force attempts...","\r\n",stop=stop_event)
     detect_brute_force()
+    spin.join()
 
+# Runs in a background thread and sets stop_event when Enter is pressed.
+def wait_for_enter():
+    input()
+    stop_event.set()
 
 if __name__ == '__main__':
     startup()
     #run checks in a loop until program is closed
-    while True:
+
+    # Start the Enter listener in a thread
+    listener = threading.Thread(target=wait_for_enter, daemon=True)
+    listener.start()
+
+    while not stop_event.is_set():
         run_hids()
         #sleep to reduce cpu cycles 
-        spinner("sleeping","\033[F\033[F\r")
-        time.sleep(5)
+        spin = spinner("sleeping Press ENTER to exit","\033[F\033[F\r",stop=stop_event)
+
+        # Wait up to n seconds, but exit immediately if Enter is pressed
+        stop_event.wait(timeout=5)
+        spin.join()
+      
+            
 #close message
-print("\nHIDS scan complete. Check hids.log for details.")
+print("\n\nHIDS scan complete. Check hids.log for details.")
 
 

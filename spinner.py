@@ -6,18 +6,20 @@ import time
 import itertools
 
 
-
-def spinner(description,end,duration=5):
-    thread = Thread(target=run_spinner(description,end,duration), args=(10,)) # create new thread for spinner
-    #start thread
-    thread.start()
-    thread.join()
+# run spinner in a new thread
+def spinner(description,end,stop,duration=5):
+    thread = Thread(target=run_spinner, args=(description, end,stop, duration)) # create new thread for spinner
+    thread.daemon = True  # Thread dies with main program
+    thread.start()  #start thread
+    return thread
     
-def run_spinner(description,end,duration):
+# print spinner animation
+def run_spinner(description,end,stop,duration):
     spinner_cycle = itertools.cycle(['|', '/', '-', '\\'])  # Spinner items
     end_time = time.time() + duration #time to run spinner for
+    print(end="'\x1b[2K'") #clear current line
     try:
-        while time.time() < end_time:
+        while time.time() < end_time and not stop.is_set():
             frame = next(spinner_cycle)    #cycle through through the items
             sys.stdout.write(f"\r{description}... {frame}") #display message and spinner
             sys.stdout.flush() #clear output
@@ -25,3 +27,5 @@ def run_spinner(description,end,duration):
         sys.stdout.write(f"{end}")  # write special character to output
     except KeyboardInterrupt:
         sys.stdout.flush() # if user interacts with console clear output
+
+
