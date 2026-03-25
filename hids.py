@@ -60,15 +60,14 @@ if __name__ == '__main__':
     listener.start()
 
     while not stop_event.is_set():
+        #run core intrusion detection
         run_hids()
-        #sleep to reduce cpu cycles 
         spin = spinner("sleeping Press ENTER to exit","\033[F\033[F\r",stop=stop_event)
-
-        # Wait up to n seconds, but exit immediately if Enter is pressed
+        # sleep to reduce cpu cycles , but exit  if Enter is pressed
         stop_event.wait(timeout=1)
         if not stop_event.is_set():
             spin.join()
     #close message
-    print("\n\nHIDS scan complete. Check hids.log for details.")
+    print("\nHIDS scan complete. Check hids.log for details.")
 
 

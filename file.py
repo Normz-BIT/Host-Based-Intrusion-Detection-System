@@ -36,14 +36,12 @@ def scan_directory(directory):
 
 # Generate and save the initial hashes
 def create_baseline():
-    print(f"\n[{FILE_MONITOR}] Creating baseline for {MONITORED_DIR} ...")
-
+   
     hashes = scan_directory(MONITORED_DIR) # get hashes of all files in the current directory and subfolder
 
     with open(HASHES_FILE, 'w') as f: #overwrites json file if it exists and creates it if not.
         json.dump(hashes, f, indent=2) #converts the dictionary data into JSON format and writes it to hashes.json.
-        print(f"\n[{FILE_MONITOR}] Baseline saved: {len(hashes)} files hashed.")
-    
+      
     return hashes # return file hash dictionary
 
 # Load existing baseline from JSON

@@ -4,7 +4,7 @@ import subprocess
 import os.path  # for file reading and writing
 
 title = "HIDS Security Events Detected"
-
+clearline ="\n\x1b[2K"
  # Send alert
 def alert():
     # Read the lastline of hids.log to alert
@@ -16,7 +16,7 @@ def alert():
     if alert_lines: # if line is not empty
         alert=''.join(alert_lines).strip() #create a string to output
         alert_notification(alert) # sends last line read from the hid.log as a string to desktop
-        print(f"\n[ALERT] {title}: {alert}",end="\n"*3) #print alert to terminal
+        print(f"\n[ALERT] {title}: {alert}{clearline}") #print alert to terminal
 
  #Send a desktop notification using notify-send
 def alert_notification(message):
