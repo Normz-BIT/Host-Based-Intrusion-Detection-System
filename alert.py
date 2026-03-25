@@ -2,7 +2,6 @@
 # desktop notification module
 import subprocess
 import os.path  # for file reading and writing
-import string
 
 title = "HIDS Security Events Detected"
 

@@ -36,15 +36,15 @@ def scan_directory(directory):
 
 # Generate and save the initial hashes
 def create_baseline():
-    print(f"[{FILE_MONITOR}] Creating baseline for {MONITORED_DIR} ...")
+    print(f"\n[{FILE_MONITOR}] Creating baseline for {MONITORED_DIR} ...")
 
-    baseline = scan_directory(MONITORED_DIR) # get hashes of all files in the current directory and subfolder
+    hashes = scan_directory(MONITORED_DIR) # get hashes of all files in the current directory and subfolder
 
     with open(HASHES_FILE, 'w') as f: #overwrites json file if it exists and creates it if not.
-        json.dump(baseline, f, indent=2) #converts the dictionary data into JSON format and writes it to hashes.json.
-        print(f"[{FILE_MONITOR}] Baseline saved: {len(baseline)} files hashed.")
+        json.dump(hashes, f, indent=2) #converts the dictionary data into JSON format and writes it to hashes.json.
+        print(f"\n[{FILE_MONITOR}] Baseline saved: {len(hashes)} files hashed.")
     
-    return baseline # return file hash dictionary
+    return hashes # return file hash dictionary
 
 # Load existing baseline from JSON
 def load_baseline():
@@ -59,18 +59,21 @@ def load_baseline():
 def check_integrity():
     baseline = load_baseline() # get saved hashes or generates new initial  ones
     current   = scan_directory(MONITORED_DIR) #continously generate new hashes to detect any changes 
-
+    detected = False
     # Detect modified and new files
     for filepath, current_hash in current.items():
         if filepath not in baseline: #check if scanned file exist in the initial scan
             log(Event.FILE_ADDED, Severity.Medium, filepath, 'New file detected')
-            create_baseline() #recreate base hashes to prevent same detection
+            detected = True
         elif baseline[filepath] != current_hash: # check if file exist but hashes are diffrent
             log(Event.FILE_MODIFIED, Severity.High, filepath, 'File hash changed')
-            create_baseline() #recreate base hashes to prevent same detection
-
+            detected = True
+            
     # Detect deleted files
     for filepath in baseline:
         if filepath not in current: # check if file in intial scan exist in the current scan
             log(Event.FILE_DELETED, Severity.Low, filepath, 'File no longer exists')
-            create_baseline() #recreate base hashes to prevent same detection
+            detected = True
+    
+    if detected:
+        create_baseline() #recreate base hashes to prevent same detection

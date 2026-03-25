@@ -67,10 +67,9 @@ if __name__ == '__main__':
 
         # Wait up to n seconds, but exit immediately if Enter is pressed
         stop_event.wait(timeout=5)
-        spin.join()
-      
-            
-#close message
-print("\n\nHIDS scan complete. Check hids.log for details.")
+        if not stop_event.is_set():
+            spin.join()
+    #close message
+    print("\n\nHIDS scan complete. Check hids.log for details.")
 
 

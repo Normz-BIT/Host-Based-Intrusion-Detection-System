@@ -19,7 +19,7 @@ def read_log():
             if lines:
                 return lines
         except Exception as e:
-            print(f"Error Reading {AUTH_LOG}: {e}")
+            print(f"\nError Reading {AUTH_LOG}: {e}")
 
 # find failed SSH login lines
 #2026-03-23T18:01:26.253290-05:00 nm sshd[17465]: Failed password for norman-martin from 192.168.0.10 port 55954 ssh2
@@ -53,7 +53,6 @@ def search_logs(lines):
             for x in range(count):
                 # account for number of times message was repeated
                 ip_detected[ip].append ({'username': username,'time': datetime.fromisoformat(timestamp)})
-        #print(line)
     return ip_detected
 
 
