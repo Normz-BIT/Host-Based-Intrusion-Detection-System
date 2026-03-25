@@ -10,7 +10,6 @@
 # send at least one type of alert
 # demonstrate detection using simulated attacks.
 
-import time     # for sleep function
 from file import check_integrity  # monitir files for any alterations
 from ssh import detect_brute_force #monitor ssh for brute force attempts
 from spinner import spinner # for console loading
@@ -39,7 +38,7 @@ def startup():
 # runs the file monitoring, ssh checks,logs and alerts
 def run_hids():
     # File Integrity Check
-    spin = spinner("Running file integrity checks ...","\r\nee",stop=stop_event)
+    spin = spinner("Running file integrity checks ...","\r\n",stop=stop_event)
     check_integrity()
     spin.join()
     # SSH Brute Force Detection
