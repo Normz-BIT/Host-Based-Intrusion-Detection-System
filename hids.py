@@ -1,4 +1,8 @@
-# Norman Martin 2300232 
+# Asher Smith 
+# Norman Martin
+# Lilly Whyte 
+# Nathan Bowen 
+
 # March 14,2025
 # Computer Security
 
@@ -63,7 +67,7 @@ if __name__ == '__main__':
         #run core intrusion detection
         run_hids()
         spin = spinner("sleeping Press ENTER to exit","\033[F\033[F\r",stop=stop_event)
-        # sleep to reduce cpu cycles , but exit  if Enter is pressed
+        # wait to reduce cpu cycles , but exit  if Enter is pressed
         stop_event.wait(timeout=1)
         if not stop_event.is_set():
             spin.join()
