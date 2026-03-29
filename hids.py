@@ -64,7 +64,7 @@ if __name__ == '__main__':
         run_hids()
         spin = spinner("sleeping Press ENTER to exit","\033[F\033[F\r",stop=stop_event)
         # sleep to reduce cpu cycles , but exit  if Enter is pressed
-        stop_event.wait(timeout=1)
+        stop_event.wait(timeout=0.5)
         if not stop_event.is_set():
             spin.join()
     #close message
